@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Bokeh Sample</title>
+    {{ js_resources|indent(4)|safe }}
+
+    {{ css_resources|indent(4)|safe }}
+    {{ plot_script|indent(4)|safe }}
+  </head>
+  <body>
+    {{ plot_div|indent(4)|safe }}
+    <script src="https://cdn.bokeh.org/bokeh/release/bokeh-x.y.z.min.js"
+        crossorigin="anonymous"></script>
+  <script src="static/three.js"></script>
+      <script src="static/MTLLoader.js"></script>
+      <script src="static/OBJLoader.js"></script>
+      <script src="static/OrbitControls.js"></script>
+      <script src="static/TransformControls.js"></script>
+		<script>
+			const renderer = new THREE.WebGLRenderer();
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.setClearColor('#e5e5e5');
+			document.body.appendChild( renderer.domElement );
+
+			camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 20000 );
+			camera.position.z = 400;
+			camera.lookAt(0,0,0);
+
+			const controls = new THREE.OrbitControls( camera, renderer.domElement );
+			controls.update();
+
+
+			// scene
+
+			scene = new THREE.Scene();
+
+			var ambient = new THREE.AmbientLight( 0x101030 );
+			scene.add( ambient );
+
+			var directionalLight = new THREE.DirectionalLight( 0xffeedd );
+			directionalLight.position.set( 0, 0, 1 );
+			scene.add( directionalLight );
+
+			var directionalLight1 = new THREE.DirectionalLight( 0xffeedd );
+			directionalLight.position.set( 1, 0, 1 );
+			scene.add( directionalLight1 );
+
+			const geometry = new THREE.BoxGeometry( 10, 10, 10 );
+			const material = new THREE.MeshBasicMaterial( {color: '#575957'} );
+			const cube = new THREE.Mesh( geometry, material );
+			scene.add( cube );
+
+
+			var manager = new THREE.LoadingManager();
+			manager.onProgress = function ( item, loaded, total ) {
+
+			};
+
+			// model
+
+			var mltLoader = new THREE.MTLLoader(manager);
+
+			mltLoader.load('static/Hull.mtl',function(mtl){
+				mtl.preload();
+
+				var loader = new THREE.OBJLoader( manager );
+				loader.setMaterials(mtl);
+				loader.load( 'static/Hull.obj', function ( object ) {
+
+
+					obj = object;
+<!--					obj.position.set({{x}},0,0)-->
+<!--					control.attach( obj );-->
+					scene.add(obj);
+<!--					scene.add( control );-->
+
+				} );
+
+			});
+
+
+<!--				control = new THREE.TransformControls( camera, renderer.domElement );-->
+<!--				control.addEventListener( 'change', render );-->
+
+<!--				control.addEventListener( 'dragging-changed', function ( event ) {-->
+
+<!--					controls.enabled = ! event.value;-->
+<!--					let handVec = new THREE.Vector3(0,0,1)-->
+
+
+<!--					posi =obj.getWorldPosition(handVec)-->
+<!--					let posi_update = new THREE.Vector3(posi.x,posi.z,posi.y)-->
+<!--					console.log(posi_update)-->
+
+
+<!--				} );-->
+
+
+
+
+<!--				window.addEventListener( 'keydown', function ( event ) {-->
+
+<!--					switch ( event.keyCode ) {-->
+
+
+<!--						case 87: // W-->
+<!--							control.setMode( 'translate' );-->
+
+<!--							break;-->
+
+<!--						case 69: // E-->
+<!--							control.setMode( 'rotate' );-->
+<!--							break;-->
+
+<!--						case 82: // R-->
+<!--							control.setMode( 'scale' );-->
+<!--							break;-->
+
+<!--					}-->
+
+<!--				} );-->
+
+
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+				controls.update();
+
+				// console.log(posi)
+
+				render()
+
+			}
+
+			function render(){
+				renderer.render(scene,camera);
+
+			}
+			animate();
+		</script>
+  </body>
+</html>
+
